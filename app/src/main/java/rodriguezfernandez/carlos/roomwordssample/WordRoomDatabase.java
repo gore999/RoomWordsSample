@@ -1,9 +1,12 @@
 package rodriguezfernandez.carlos.roomwordssample;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 
 @Database(entities = {Word.class},version = 1,exportSchema = false)
 public abstract class WordRoomDatabase extends RoomDatabase {
@@ -18,10 +21,43 @@ public abstract class WordRoomDatabase extends RoomDatabase {
                     //Necesita el contexto de la aplicacion, la clase WordRoomDatabase y el nombre de la base de datos.
                     INSTANCE= Room.databaseBuilder(context.getApplicationContext(),WordRoomDatabase.class,"word_database")
                             .fallbackToDestructiveMigration()//Si hay migracion a una nueva base, destruimos los datos previos: )
+                            .addCallback(sRoomDatabaseCallback)//Añadir el callback
                             .build();
                 }
             }
         }
         return INSTANCE;
     }
+    //Crear un callback que se llame antes de crear la base de datos.
+    private static RoomDatabase.Callback sRoomDatabaseCallback=new RoomDatabase.Callback(){
+        @Override
+        public void onOpen(@NonNull SupportSQLiteDatabase db) {
+            super.onOpen(db);
+            new PopulateDbAsync(INSTANCE).execute();
+        }
+    };
+
+    //Esta clase ejecuta en segundo plano
+    private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
+
+        private final WordDao mDao;
+        String[] words = {"dolphin", "crocodile", "cobra"};
+        //El constructor crea el dao a partir de una base de datos que se le pase.
+        PopulateDbAsync(WordRoomDatabase db) {
+            mDao = db.wordDao();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // borramos todo
+            mDao.deleteAll();
+            //Añadimos datos.
+            for (int i = 0; i <= words.length - 1; i++) {
+                Word word = new Word(words[i]);
+                mDao.insert(word);
+            }
+            return null;
+        }
+    }
+
 }
