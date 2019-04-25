@@ -18,4 +18,5 @@ public interface WordDao {
     LiveData<List<Word>> getAllWords();
     @Query("SELECT * FROM word_table LIMIT 1")
     Word[] getAnyWord();
+
 }
