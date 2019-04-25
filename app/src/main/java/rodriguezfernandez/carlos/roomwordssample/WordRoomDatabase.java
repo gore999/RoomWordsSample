@@ -8,7 +8,7 @@ import android.content.Context;
 @Database(entities = {Word.class},version = 1,exportSchema = false)
 public abstract class WordRoomDatabase extends RoomDatabase {
     private static WordRoomDatabase INSTANCE;
-    //Metodo para recuperar el Dao.
+    //Metodo Abstracto para recuperar el Dao.
     public abstract WordDao wordDao();
     //Será una clase tipo singleton (una unica instancia para toda la app)
     public static WordRoomDatabase getDatabase(final Context context){
