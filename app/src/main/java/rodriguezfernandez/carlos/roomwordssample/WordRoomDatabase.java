@@ -50,12 +50,12 @@ public abstract class WordRoomDatabase extends RoomDatabase {
         @Override
         protected Void doInBackground(final Void... params) {
             // borramos todo
-            mDao.deleteAll();
-            //Añadimos datos.
-            for (int i = 0; i <= words.length - 1; i++) {
-                Word word = new Word(words[i]);
-                mDao.insert(word);
-            }
+           if(mDao.getAnyWord().length<1){//Si la base de datos está vacía, añadimos las del array.
+               for(int i=0;i<=words.length-1;i++){
+                   Word word=new Word(words[i]);
+                   mDao.insert(word);
+               }
+           }
             return null;
         }
     }

@@ -16,4 +16,6 @@ public interface WordDao {
     void deleteAll();
     @Query("SELECT * FROM word_table ORDER BY word ASC")
     LiveData<List<Word>> getAllWords();
+    @Query("SELECT * FROM word_table LIMIT 1")
+    Word[] getAnyWord();
 }
